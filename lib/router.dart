@@ -1,6 +1,7 @@
 import 'package:iExist/views/home.dart';
+import 'package:iExist/views/result.dart';
 
 var routes = {
   '/': (context) => Home(),
-  '/second': (context) => Home(),
+  '/result': (context) => Result(),
 };
