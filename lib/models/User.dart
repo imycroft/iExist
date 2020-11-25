@@ -10,12 +10,9 @@ class User {
     this.phoneNumber = map['phoneNumber'];
     this.description = map['description'];
   }
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> map = new Map();
-    map['id'] = this.id;
-    map['name'] = this.name;
-    map['phoneNumber'] = this.phoneNumber;
-    map['description'] = this.description;
-    return map;
-  }
+
+  Map<String, dynamic> toJson() =>
+      {'name': name,
+       'phoneNumber': phoneNumber,
+       'description': description};
 }
