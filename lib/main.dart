@@ -3,7 +3,7 @@ import 'package:iExist/router.dart';
 
 void main() {
   runApp(MaterialApp(
-    initialRoute: '/',
+    initialRoute: '/auth',
     routes: routes,
   ));
 }
