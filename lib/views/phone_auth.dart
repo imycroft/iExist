@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:iExist/services/authservice.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,32 +12,34 @@ class _HomePageState extends State<HomePage> {
   String smsCode;
   String verificationId;
 
-  Future<void> verifyPhone() async {
-    final PhoneCodeAutoRetrievalTimeout autoRetrieve = (verID) {
-      this.verificationId = verID;
-    };
-
+  Future<void> verifyPhone(phoneNumber) async {
     final PhoneCodeSent smsCodeSent = (verId, [int forceCodeResend]) {
       this.verificationId = verId;
+      setState(() {});
       smsCodeDialog(context).then((value) {
         print('signed in');
       });
     };
 
-    final PhoneVerificationCompleted verifiedSuccess = (user) {
-      print('verified');
+    final PhoneVerificationCompleted verifiedSuccess =
+        (AuthCredential authResult) {
+      AuthService().signIn(authResult);
     };
 
     final PhoneVerificationFailed verifiFailed = (e) {
-      print('${e.message}');
+      print('Walidation:${e.message}');
+    };
+
+    final PhoneCodeAutoRetrievalTimeout autoTimeout = (verId) {
+      this.verificationId = verId;
     };
     await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: this.phoneNo,
         verificationCompleted: verifiedSuccess,
         verificationFailed: verifiFailed,
         codeSent: smsCodeSent,
-        codeAutoRetrievalTimeout: autoRetrieve,
-        timeout: const Duration(seconds: 5));
+        codeAutoRetrievalTimeout: autoTimeout,
+        timeout: const Duration(seconds: 10));
   }
 
   Future<bool> smsCodeDialog(context) {
@@ -55,27 +58,12 @@ class _HomePageState extends State<HomePage> {
             actions: [
               FlatButton(
                   onPressed: () {
-                    var user = FirebaseAuth.instance.currentUser;
-                    if (user != null) {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pushReplacementNamed('/');
-                    } else {
-                      Navigator.of(context).pop();
-                      signIn();
-                    }
+                    AuthService().signInWithOTP(smsCode, verificationId);
                   },
                   child: Text('Done'))
             ],
           );
         });
-  }
-
-  signIn() {
-    FirebaseAuth.instance.signInWithPhoneNumber(phoneNo).then((user) {
-      Navigator.of(context).pushReplacementNamed('/');
-    }).catchError((e) {
-      print(e);
-    });
   }
 
   @override
@@ -98,7 +86,9 @@ class _HomePageState extends State<HomePage> {
                 height: 10,
               ),
               RaisedButton(
-                onPressed: verifyPhone,
+                onPressed: () {
+                  verifyPhone(phoneNo);
+                },
                 child: Text('Verify'),
                 textColor: Colors.white,
                 elevation: 7.0,

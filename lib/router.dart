@@ -4,7 +4,7 @@ import 'package:iExist/views/phone_auth.dart';
 import 'package:iExist/views/result.dart';
 
 var routes = {
-  '/': (context) => Home(),
+  //'/': (context) => Home(),
   '/result': (context) => Result(),
   '/add': (context) => AddPerson(),
   '/auth': (context) => HomePage()
